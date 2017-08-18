@@ -9,9 +9,12 @@
 from flask import Flask, render_template, url_for, jsonify, request
 import random
 from common import get_cluster
+from itertools import groupby
+from data.data import  load_data
+
 
 app = Flask(__name__)
-
+app.data = load_data('data/2016-07-012017-07-01.csv')
 
 @app.route('/')
 def main():
@@ -23,11 +26,10 @@ def main():
 
 @app.route('/cluster', methods=['POST'])
 def cluster():
-    # days = request.args.get('days')
-    # types = request.args.get('types')
     days = int(request.form.get('days'))
     types = int(request.form.get('types'))
-    # 获取mongo数据
+    print days, types
+
 
     s_data = {
         "000001.SZ": map(lambda x: random.uniform(1, 10), range(10)),
@@ -40,11 +42,16 @@ def cluster():
         "000008.SZ": map(lambda x: random.uniform(1, 10), range(10)),
         "000009.SZ": map(lambda x: random.uniform(1, 10), range(10)),
         "000010.SZ": map(lambda x: random.uniform(1, 10), range(10)),
-
     }
+
+	# use mongo data
+
+    s_data = app.data
     sort_keys = sorted(s_data.keys())
     d = [s_data[i] for i in sort_keys]
+    print('fff')
     d = get_cluster(d, types, )
+    print('dd')
     return jsonify({"source": s_data, "sort_keys": sort_keys, "cluster": d[1], "centers": d[0]})
 
 
@@ -59,4 +66,4 @@ def type_list():
 
 
 if __name__ == '__main__':
-    app.run()
+	app.run(host='0.0.0.0',port=4444)

@@ -1,5 +1,4 @@
-/**
- * Created by Ky on 2017/8/13.
+/** * Created by Ky on 2017/8/13.
  */
 var c = function (index, num, data, data_2, data_3) {
     var id = "chart_" + index
@@ -42,10 +41,11 @@ var c = function (index, num, data, data_2, data_3) {
 
 jQuery(document).ready(function () {
     $.ajax({
-        url: "http://127.0.0.1:5000/cluster",
+        url: "/cluster",
         type: "post",
         async: false,
-        data: {"days": 5, "types": 3},
+        //data: {"days": 5, "types": 3},
+        data: {"days": 5, "types": 6},
         success: function (data) {
             console.log(data)
             clusters = data["cluster"]

@@ -75,6 +75,8 @@ def DTWDistance(s1, s2, w=5):
 
 
 def k_means_clust(data, num_clust, num_iter, w=5):
+    print len(data)
+    print type(num_clust)
     centroids = random.sample(data, num_clust)
     #     centroids=[data[0],data[1]]
     #     print centroids
@@ -131,9 +133,14 @@ def LB_Keogh(s1, s2, r):
 def get_cluster(d_list, types):
     random.uniform(1, 10)
 
+   # d_list = [[round(np.mean(line),2) if x == 0 else x for x in line] for line in d_list]
+    #avg = round(np.mean(d_list),2)
+    #d_list = [avg if x == 0 else x for x in d_list]
+
     d_list = [map(lambda x: x - line[0], line) for line in d_list]
 
     data = np.array(d_list)
+    # data = d_list
 
     centroids, assignments = k_means_clust(data, types, 30, 4)
     return centroids, assignments

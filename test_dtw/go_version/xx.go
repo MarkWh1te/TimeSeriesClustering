@@ -1,5 +1,4 @@
-package main
-
+package main 
 import(
     "fmt"
     "sort"
@@ -225,4 +224,3 @@ func k_means_clust(data_list [][]float64,num_clust int,num_iter int, w int)([][]
     }
     return centroids, assignments
 }
-

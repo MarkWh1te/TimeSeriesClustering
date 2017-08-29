@@ -17,7 +17,7 @@ func readcsv(path string) [][]string {
 	if err != nil {
 		// err is printable
 		// elements passed are separated by space automatically
-		// fmt.Println("Error:", err)
+		fmt.Println("Error:", err)
 	}
 	// automatically call Close() at the end of current method
 	defer file.Close()

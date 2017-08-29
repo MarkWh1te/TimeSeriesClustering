@@ -70,7 +70,7 @@ func get_centroid() ([][]float64, map[int][]int) {
 		data_list = append(data_list, to_zero(datas[v]))
 	}
 	// fmt.Println(data_list)
-	centroids, assignments := k_means_clust(data_list, 5, 30, 3)
+	centroids, assignments := k_means_clust(data_list, 5, 10, 3)
 	// fmt.Println("okkkkkkkkkkk")
 	// fmt.Println(centroids)
 	// fmt.Println(assignments)
@@ -272,7 +272,6 @@ func k_means_clust(data_list [][]float64, num_clust int, num_iter int, w int) ([
 						clust_sum = append(clust_sum, 0)
 					}
 					clust_sum[kkk] += vvv
-
 				}
 			}
 			for kk, vv := range clust_sum {

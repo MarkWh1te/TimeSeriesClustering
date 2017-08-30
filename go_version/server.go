@@ -1,5 +1,5 @@
 package main 
-import (
+import ( 
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -18,32 +18,37 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
+// func datetoidx(startTime int,endTime int)(int int){
+// 	return staridx
+// }
+var start0 = readcsv("start0-2011-01-012017-08-01.csv")
+var start3 = readcsv("start3-2011-01-012017-08-01.csv")
+var start6 = readcsv("start6-2011-01-012017-08-01.csv")
+// var data0 = dataclean(start0)
+// var data3 = dataclean(start3)
+// var data6 = dataclean(start6)
+
 
 func cluster(w http.ResponseWriter, r *http.Request) {
 	// get post args
 	r.ParseForm()
 	days := r.Form.Get("days") 
-	types := r.Form.Get("tyes") 
+	types := r.Form.Get("tpyes") 
 	fmt.Println(days,types)
 
-	// generate random data for test
-	datas := make(map[string][]float64)
-	datas["a"] = []float64{1.11, 2.22, 3.33, 4.44, 5.55}
-	datas["b"] = []float64{2.34, 4.56, 5.12, 6.04, 5.55}
-	datas["c"] = []float64{1.55, 2.21, 3.13, 4.24, 5.55}
-	datas["d"] = []float64{2.34, 4.56, 5.12, 6.04, 5.55}
-	datas["e"] = []float64{11.11, 23.22, 32.33, 41.44, 15.55}
-	fmt.Println(datas)
+	data0 := ShortData(start3,20,30)
+	fmt.Println(data0)
 
-	// use mongodb data
-	raw := readcsv("2016-07-012017-07-01.csv")[:20]
-	csv_data := dataclean(raw)
-	fmt.Println(csv_data)
-	datas = csv_data
+
+	// fmt.Println(raw)
+	// csv_data := dataclean(raw)
+	// fmt.Println(csv_data)
+	// datas = csv_data
 
 	// get the algorithms answer
-	centroids, assignments, keys := get_centroid(datas)
-	data:= StockData{Source:datas,Sort_keys:keys,Cluster:assignments,Centers:centroids}
+	centroids, assignments, keys,data_list := get_centroid(data0,20)
+	data:= StockData{Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
+	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 
 	// generate  json data
 	jData, err := json.Marshal(data)
@@ -56,6 +61,7 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
 	// calculate fucntion runining time 
 	// start := time.Now()
 	// _, assignments := get_centroid()

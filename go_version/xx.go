@@ -48,20 +48,12 @@ func dataclean(raw [][]string) map[string][]float64 {
 	return csv_data
 }
 
-func get_centroid() ([][]float64, map[int][]int,[]string) {
+func get_centroid(datas map[string][]float64) ([][]float64, map[int][]int,[]string) {
 
-	datas := make(map[string][]float64)
-	datas["a"] = []float64{1.11, 2.22, 3.33, 4.44, 5.55}
-	datas["b"] = []float64{2.34, 4.56, 5.12, 6.04, 5.55}
-	datas["c"] = []float64{1.55, 2.21, 3.13, 4.24, 5.55}
-	datas["d"] = []float64{2.34, 4.56, 15.12, 16.04, 5.55}
-	datas["e"] = []float64{11.11, 23.22, 32.33, 41.44, 15.55}
-	// fmt.Println(datas)
-
-	raw := readcsv("2016-07-012017-07-01.csv")
-	csv_data := dataclean(raw)
-	fmt.Println(csv_data)
-	datas = csv_data
+	// raw := readcsv("2016-07-012017-07-01.csv")[:20]
+	// csv_data := dataclean(raw)
+	// fmt.Println(csv_data)
+	// datas = csv_data
 
 	var keys = sorted_keys(datas)
 	// fmt.Println(keys)
@@ -70,7 +62,7 @@ func get_centroid() ([][]float64, map[int][]int,[]string) {
 		data_list = append(data_list, to_zero(datas[v]))
 	}
 	// fmt.Println(data_list)
-	centroids, assignments := k_means_clust(data_list, 5, 10, 3)
+	centroids, assignments := k_means_clust(data_list, 5, 50, 3)
 	// fmt.Println("okkkkkkkkkkk")
 	// fmt.Println(centroids)
 	// fmt.Println(assignments)

@@ -1,7 +1,9 @@
-package main import ( 
+package main 
+import ( 
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	// "time"
 )
 type StockData struct {
@@ -50,11 +52,32 @@ var codemap = map[string]map[string][]float64{
 // var data3 = dataclean(start3)
 // var data6 = dataclean(start6)
 
-func timeToIndex(starttime int endtime)(int int){
-	var min_idx,max_idx int
-	for k,v := stocklist{
+func timeToIndex(starttime float64,endtime float64)(int int){
+	// var min_idx,max_idx int
+	// starttime = float64(starttime)
+	// endtime = float64(endtime)
+	for k,v := range stocklist{
+		min_idx := k
+		if starttime == v{
+			break
+		}
+		if v > starttime{
+			min_idx = k-1
+			break
+		}
 	}
-
+	for k,v := range stocklist{
+		max_idx := k
+		if endtime == v{
+			max_idx = k
+			break
+		}
+		if endtime < v{
+			max_idx = k-1
+			break
+		}
+	}
+	return min_idx,max_idx
 }
 
 func cluster(w http.ResponseWriter, r *http.Request) {
@@ -67,11 +90,17 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	methods := r.Form.Get("method")
 	fmt.Println(start_date,end_date,types,stock)
 
+	// init data
+	datas := codemap[stock]
+	start_float,_ := strconv.ParseFloat(start_date,64)
+	end_float,_ := strconv.ParseFloat(end_date,64)
+	min_idx,max_idx = timeToIndex(start_float,end_float)
+	rawdata := ShortData(datas,min_idx,max_idx)
+	// rawdata := ShortData(datas,20,30)
+
 	// fmt.Println(stock)
 	// fmt.Println(start36)
 	// fmt.Println(codemap["6,3"])
-	datas := codemap[stock]
-	rawdata := ShortData(datas,20,30)
 	
 	// fmt.Println(rawdata)
 
@@ -82,7 +111,7 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	// datas = csv_data
 
 	// get the algorithms answer
-	centroids, assignments, keys,data_list := get_centroid(rawdata,20)
+	centroids, assignments, keys,data_list := get_centroid(rawdata,int(types))
 	data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 

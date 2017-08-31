@@ -5,19 +5,66 @@
     <title>Title</title>
     <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
     <script src="https://cdn.bootcss.com/jquery/3.2.0/jquery.js"></script>
-    <!-- <link rel="stjjylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}"/> -->
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="ui-choose.js"></script>
+    <script src="select-widget-min.js"></script>
+    <link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css">
     <link rel="stylesheet" type="text/css" href="main.css"/>
+    <link rel="stylesheet" type="text/css" href="ui-choose.css"/>
+    <link rel="stylesheet" type="text/css" href="drop-down.css"/>
 
 </head>
 <body>
-<form action="/" id="searchForm">
-    <input type="number" name="types" placeholder="clusters numbers" />
-    <input type="number" name="iters" placeholder="iter times" />
-    <input type="submit" value="Search" />
-</form>
 <div>
-    <div id="select_area"></div>
-    <ul id="chart_area">
+    <div id="user_select">
+        <div>
+            <div>
+                <div class="inline_div inline_divx">分类数:</div>
+                <div class="inline_div">
+
+                    <select name="drop1" class="ui-select" id="types">
+                        <option selected value=3>3</option>
+                        <option value=4>4</option>
+                        <option value=5>5</option>
+                        <option value=6>6</option>
+                        <option value=7>7</option>
+                        <option value=8>8</option>
+                        <option value=9>9</option>
+                        <option value=10>10</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <div class="inline_div inline_divx">分类方法:</div>
+                <div class="inline_div">
+
+                    <select name="drop1" class="ui-select" id="method">
+                        <option selected value=0>前复权价</option>
+                        <option value=1>涨幅</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="xxx">
+                <select class="ui-choose" multiple="multiple" id="uc_04">
+                    <option value="0">深市</option>
+                    <option value="6">沪市</option>
+                    <option value="3" selected>创业板</option>
+                </select>
+            </div>
+        </div>
+        <div class="time_select">
+            <div class="inline_div inline_divx">开始时间:<input type="text" id="start_date"></div>
+            <div class="inline_div inline_divx">结束时间:<input type="text" id="end_date"></div>
+            <button class="btn" id="start">开始</button>
+        </div>
+    </div>
+    <ul id="chart_area" class="chart_areas">
+
+    </ul>
+
+    <ul id="chart_area2" class="chart_areas">
 
     </ul>
 

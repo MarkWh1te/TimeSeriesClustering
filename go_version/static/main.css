@@ -41,8 +41,39 @@ p {
     word-wrap: break-word
 }
 
-#chart_area li {
+.chart_areas li {
     display: inline-block;
     width: 33%;
 
+}
+
+#user_select{
+    padding:20px 50px;
+
+}
+
+.inline_div{
+    display: inline-block;
+}
+.inline_divx{
+    font-size: 18px;
+}
+.xxx{
+    padding:20px 0;
+}
+.hasDatepicker{
+    height: 30px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #A9A9A9;
+}
+
+.time_select{
+    line-height: 30px;
+}
+.btn{
+    height:30px;
+    width:40px;
+    border-radius: 5px;
 }

@@ -19,28 +19,13 @@ func ShortData(data map[string][]float64,start int,end int)(map[string][]float64
 	return shortData
 }
 
-func readCode(path string) map[string][]float64{
-	file, err := os.Open(path)
-	if err != nil {
-		// err is printable
-		// elements passed are separated by space automatically
-		fmt.println("error:", err)
-	}
-	defer file.Close()
-	rawCSVdata, err := reader.ReadAll()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
 func readcsv(path string) map[string][]float64{
 	// read csv part
 	file, err := os.Open(path)
 	if err != nil {
 		// err is printable
 		// elements passed are separated by space automatically
-		fmt.println("error:", err)
+		fmt.Println("error:", err)
 	}
 	// automatically call Close() at the end of current method
 	defer file.Close()
@@ -84,7 +69,7 @@ func get_centroid(datas map[string][]float64,n int) ([][]float64, map[int][]int,
 		data_map[v] = a
 	}
 	// fmt.Println(data_list)
-	centroids, assignments := k_means_clust(data_list, n, 100, 3)
+	centroids, assignments := k_means_clust(data_list, n, 20, 3)
 	// fmt.Println("okkkkkkkkkkk")
 	// fmt.Println(centroids)
 	// fmt.Println(assignments)
@@ -93,12 +78,26 @@ func get_centroid(datas map[string][]float64,n int) ([][]float64, map[int][]int,
 
 func to_zero(arr []float64) []float64 {
 	var tmp []float64
-	for _, v := range arr {
+	for k, v := range arr {
 		tmp = append(tmp, Round(v-arr[0], 2))
 	}
 	// fmt.Println(tmp)
 	return tmp
 }
+
+func to_rate(arr []float64) []float64 {
+	var tmp []float64
+	for k, v := range arr {
+		// tmp = append(tmp, Round(v-arr[0], 2))
+		// tmp = append(tmp, Round(v/arr[0], 2))
+		if k!=0{
+		tmp = append(tmp,Round((v-arr[k-1])/arr[k-1],2))
+		}
+	}
+	// fmt.Println(tmp)
+	return tmp
+}
+
 func sorted_keys(m map[string][]float64) []string {
 	sorted_keys := make([]string, 0)
 	for k, _ := range m {

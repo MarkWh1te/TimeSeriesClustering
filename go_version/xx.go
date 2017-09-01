@@ -155,6 +155,8 @@ func bisecting_k_means_clust(data_list map[int][]float64, num_clust int, num_ite
 		//DeleteSlice(allassign,max_index)
 		//DeleteSlice(,max_index)
 	}
+
+	fmt.Println(allassign)
 	return allcentroids, allassign
 }
 
@@ -241,6 +243,7 @@ func readcsv(path string) map[string][]float64{
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	// rawCSVdata = rawCSVdata[:20]
 
 	// sanity check, display to standard output
 	// for _, each := range rawCSVdata {
@@ -301,6 +304,7 @@ func get_centroid_new(datas map[string][]float64,n int) ([][]float64, map[int][]
 	for k,v := range assignments{
 		newassignments[k] = v
 	}
+	fmt.Println(newassignments,keys,data_map)
 	return centroids, newassignments,keys,data_map
 }
 

@@ -97,6 +97,7 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	start_float,_ := strconv.ParseFloat(start_date,64)
 	end_float,_ := strconv.ParseFloat(end_date,64)
 	min_idx,max_idx := timeToIndex(start_float,end_float)
+	fmt.Println(min_idx,max_idx)
 	rawdata := ShortData(datas,min_idx,max_idx)
 	// rawdata := ShortData(datas,20,30)
 
@@ -114,8 +115,8 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 
 	// get the algorithms answer
 	typesint,_ := strconv.ParseInt(types,10,64)
-	centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
-	// centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
+	// centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
+	centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
 	data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 

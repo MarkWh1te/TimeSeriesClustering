@@ -52,12 +52,12 @@ var codemap = map[string]map[string][]float64{
 // var data3 = dataclean(start3)
 // var data6 = dataclean(start6)
 
-func timeToIndex(starttime float64,endtime float64)(int int){
-	// var min_idx,max_idx int
+func timeToIndex(starttime float64,endtime float64)(int,int){
+	var min_idx,max_idx int
 	// starttime = float64(starttime)
 	// endtime = float64(endtime)
 	for k,v := range stocklist{
-		min_idx := k
+		min_idx = k
 		if starttime == v{
 			break
 		}
@@ -67,7 +67,7 @@ func timeToIndex(starttime float64,endtime float64)(int int){
 		}
 	}
 	for k,v := range stocklist{
-		max_idx := k
+		max_idx = k
 		if endtime == v{
 			max_idx = k
 			break
@@ -77,6 +77,7 @@ func timeToIndex(starttime float64,endtime float64)(int int){
 			break
 		}
 	}
+	fmt.Println(min_idx,max_idx)
 	return min_idx,max_idx
 }
 
@@ -87,14 +88,15 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	end_date := r.Form.Get("end_date") 
 	types := r.Form.Get("types") 
 	stock := r.Form.Get("stock")
-	methods := r.Form.Get("method")
+	// methods := r.Form.Get("method")
+	// centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
 	fmt.Println(start_date,end_date,types,stock)
 
 	// init data
 	datas := codemap[stock]
 	start_float,_ := strconv.ParseFloat(start_date,64)
 	end_float,_ := strconv.ParseFloat(end_date,64)
-	min_idx,max_idx = timeToIndex(start_float,end_float)
+	min_idx,max_idx := timeToIndex(start_float,end_float)
 	rawdata := ShortData(datas,min_idx,max_idx)
 	// rawdata := ShortData(datas,20,30)
 
@@ -111,7 +113,9 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	// datas = csv_data
 
 	// get the algorithms answer
-	centroids, assignments, keys,data_list := get_centroid(rawdata,int(types))
+	typesint,_ := strconv.ParseInt(types,10,64)
+	centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
+	// centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
 	data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 

@@ -9,6 +9,211 @@ import (
 	"strconv"
 	"time"
 )
+func k_means_clust_new(data_list map[int][]float64, num_clust int, num_iter int, w int) ([][]float64, map[int][]int, map[int]float64) {
+
+	// generate init centorids
+	var keys []int
+	for k, _ := range data_list {
+		keys = append(keys, k)
+	}
+	rand_keys := (generateRandomNumber(0, len(keys), num_clust))
+	var centroids [][]float64
+	for _, v := range rand_keys {
+		centroids = append(centroids, data_list[keys[v]])
+	}
+	//fmt.Println(rand_keys)
+	//fmt.Println(data_list)
+	// fmt.Println("xxxxx", rand_keys,centroids)
+
+	counter := 0
+	assignments := make(map[int][]int)
+	sumdistance := make(map[int]float64)
+	for i := 0; i < num_iter; i++ {
+		counter += 1
+		// fmt.Println("counter times", counter, "centroids", centroids)
+		// init empty  assignment every iteration
+		for k, _ := range centroids {
+			assignments[k] = []int{}
+			sumdistance[k] = 0.0
+		}
+		//增加每个质心的误差值保存
+		for k, v := range data_list {
+			// fmt.Println("pppppppppppppppp")
+			min_dist := math.Inf(1)
+			var closest_clust int
+			// fmt.Println(closest_clust)
+			for kk, vv := range centroids {
+				// fmt.Println(LB_Keogh(v,vv,w))
+				// fmt.Println(v, vv, w)
+				if LB_Keogh(v, vv, w) < min_dist {
+					cur_dist := DtwDistance(v, vv)
+					// fmt.Println(cur_dist)
+					if cur_dist < min_dist {
+						min_dist = cur_dist
+						closest_clust = kk
+					}
+				}
+			}
+			// fmt.Println(closest_clust)
+			assignments[closest_clust] = append(assignments[closest_clust], k)
+			sumdistance[closest_clust] += min_dist
+			// fmt.Println("iter times",i,"assignment",assignments)
+		}
+
+		for k, v := range assignments {
+			sumdistance[k] = sumdistance[k] / float64(len(v))
+			var clust_sum []float64
+			for _, vv := range v {
+				for kkk, vvv := range data_list[vv] {
+					if len(clust_sum) < kkk+1 {
+						clust_sum = append(clust_sum, 0)
+					}
+					clust_sum[kkk] += vvv
+				}
+			}
+			for kk, vv := range clust_sum {
+				centroids[k][kk] = vv / float64(len(v))
+			}
+
+		}
+	}
+	return centroids, assignments, sumdistance
+}
+
+func bisecting_k_means_clust(data_list map[int][]float64, num_clust int, num_iter int, w int) ([][]float64, [][]int) {
+	//var clust_sum []float64
+	// generate init centorids
+	var allcentroids [][]float64
+	var allassign [][]int
+	var alldistance []float64
+	for {
+		//fmt.Println("xxxxxxxxxxxxx")
+		//fmt.Println(len(allcentroids))
+		var lastd = math.Inf(1)
+		lastassign := make(map[int][]int)
+		lastdistance := make(map[int]float64)
+		var lastcentroids [][]float64
+		//求最小值
+		//fmt.Println("yyyyyyyyyyyyyyyy")
+		for i := 0; i < 20; i++ {
+		// for i := 0; i < 100; i++ {
+
+			//fmt.Println("zzz")
+			centroids, assignments, sumdistance := k_means_clust_new(data_list, 2, num_iter, w)
+			//fmt.Println("iii")
+			nowdistance := sum([]float64{sumdistance[0], sumdistance[1]})
+			if nowdistance < lastd {
+				lastd = nowdistance
+				lastcentroids = centroids
+				lastassign = assignments
+				lastdistance = sumdistance
+			}
+		}
+		// 汇总
+		//fmt.Println(lastcentroids)
+		//fmt.Println(lastassign)
+		//fmt.Println(lastdistance)
+		for k, v := range lastcentroids {
+			allcentroids = append(allcentroids, v)
+			allassign = append(allassign, lastassign[k])
+			alldistance = append(alldistance, lastdistance[k])
+		}
+		//fmt.Println(allcentroids)
+		//fmt.Println(allassign)
+		//fmt.Println(alldistance)
+		if len(allcentroids) == num_clust {
+			break
+		}
+		// 求最大值
+		var maxdistance = math.Inf(-1)
+		var max_index = 0
+
+		for k, v := range alldistance {
+			if v > maxdistance {
+				maxdistance = v
+				max_index = k
+			}
+		}
+		fmt.Println(max_index)
+		max_index_list := allassign[max_index]
+		fmt.Println(max_index_list)
+		tmp := make(map[int][]float64)
+		for _, v := range max_index_list {
+			tmp[v] = data_list[v]
+		}
+		//fmt.Println(tmp)
+		data_list = tmp
+		//fmt.Println(data_list)
+		allcentroids = DeleteSlice(allcentroids, max_index)
+		//fmt.Println(allcentroids)
+		allassign = DeleteSlice3(allassign, max_index)
+		//fmt.Println(allassign)
+		alldistance = DeleteSlice2(alldistance, max_index)
+		//fmt.Println(alldistance)
+		//fmt.Println(DeleteSlice3(allcentroids, max_index), e)
+
+		//DeleteSlice(allassign,max_index)
+		//DeleteSlice(,max_index)
+	}
+	return allcentroids, allassign
+}
+
+//删除切片
+func DeleteSlice(sss [][]float64, index int) ([][]float64) {
+	//sliceValue := reflect.ValueOf(slice)
+	length := len(sss)
+	if sss == nil || length == 0 || (length-1) < index {
+		return nil
+	}
+	if length-1 == index {
+		return sss[0:index]
+	} else if (length - 1) >= index {
+		//return reflect.AppendSlice(sliceValue.Slice(0, index), sliceValue.Slice(index+1, length)).Interface()
+		tmp := sss[0: index]
+		for _, v := range sss[index+1:length] {
+			tmp = append(tmp, v)
+		}
+		return tmp
+	}
+	return nil
+}
+func DeleteSlice2(sss []float64, index int) ([]float64) {
+	//sliceValue := reflect.ValueOf(slice)
+	length := len(sss)
+	if sss == nil || length == 0 || (length-1) < index {
+		return nil
+	}
+	if length-1 == index {
+		return sss[0:index]
+	} else if (length - 1) >= index {
+		//return reflect.AppendSlice(sliceValue.Slice(0, index), sliceValue.Slice(index+1, length)).Interface()
+		tmp := sss[0: index]
+		for _, v := range sss[index+1:length] {
+			tmp = append(tmp, v)
+		}
+		return tmp
+	}
+	return nil
+}
+
+func DeleteSlice3(sss [][]int, index int) ([][]int) {
+	//sliceValue := reflect.ValueOf(slice)
+	length := len(sss)
+	if sss == nil || length == 0 || (length-1) < index {
+		return nil
+	}
+	if length-1 == index {
+		return sss[0:index]
+	} else if (length - 1) >= index {
+		//return reflect.AppendSlice(sliceValue.Slice(0, index), sliceValue.Slice(index+1, length)).Interface()
+		tmp := sss[0: index]
+		for _, v := range sss[index+1:length] {
+			tmp = append(tmp, v)
+		}
+		return tmp
+	}
+	return nil
+}
 
 func ShortData(data map[string][]float64,start int,end int)(map[string][]float64){
 	shortData := make(map[string][]float64)
@@ -75,10 +280,34 @@ func get_centroid(datas map[string][]float64,n int) ([][]float64, map[int][]int,
 	// fmt.Println(assignments)
 	return centroids, assignments,keys,data_map
 }
+func get_centroid_new(datas map[string][]float64,n int) ([][]float64, map[int][]int,[]string,map[string][]float64) {
+	var keys = sorted_keys(datas)
+	// fmt.Println(keys)
+	// var data_list map[int][]float64
+	data_list := make(map[int][]float64)
+	// var data_map map[string][]float64
+	data_map := make(map[string][]float64)
+	for k, v := range keys {
+		a := to_zero(datas[v])
+		data_list[k] = a
+		data_map[v] = a
+	}
+	// fmt.Println(data_list)
+	centroids, assignments := bisecting_k_means_clust(data_list, n, 20, 3)
+	// fmt.Println("okkkkkkkkkkk")
+	// fmt.Println(centroids)
+	// fmt.Println(assignments)
+	newassignments := make(map[int][]int)
+	for k,v := range assignments{
+		newassignments[k] = v
+	}
+	return centroids, newassignments,keys,data_map
+}
+
 
 func to_zero(arr []float64) []float64 {
 	var tmp []float64
-	for k, v := range arr {
+	for _, v := range arr {
 		tmp = append(tmp, Round(v-arr[0], 2))
 	}
 	// fmt.Println(tmp)

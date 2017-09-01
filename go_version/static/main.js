@@ -64,8 +64,7 @@ var c = function (char_id,index, num, data, data_2, data_3) {
 jQuery(document).ready(function () {
     var request_date = function (args) {
         $.ajax({
-            // url: "http://127.0.0.1:5000/cluster",
-            url: "http://127.0.0.1:8080/cluster",
+            // url: "http://127.0.0.1:5000/cluster", url: "http://127.0.0.1:8080/cluster",
             type: "post",
             async: false,
             data: args,

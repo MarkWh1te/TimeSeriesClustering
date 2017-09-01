@@ -166,7 +166,8 @@ jQuery(document).ready(function () {
         request_date({
             "start_date": 20170715,
             "end_date": 20170731,
-            "stock": "0,6,3",
+            "stock": "3",
+            // "stock": "0,6,3",
             "method": 0,
             "types": 3
         })

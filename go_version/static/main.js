@@ -1,7 +1,3 @@
-/**
- * Created by Ky on 2017/8/13.
- */
-
 // 日期格式化方法
 Date.prototype.format = function (format) {
     var date = {

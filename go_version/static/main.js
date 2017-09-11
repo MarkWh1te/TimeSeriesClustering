@@ -64,7 +64,8 @@ var c = function (char_id,index, num, data, data_2, data_3) {
 jQuery(document).ready(function () {
     var request_date = function (args) {
         $.ajax({
-            // url: "http://127.0.0.1:5000/cluster", url: "http://127.0.0.1:8080/cluster",
+            // url: "http://127.0.0.1:5000/cluster", 
+            url: "http://127.0.0.1:8080/cluster",
             type: "post",
             async: false,
             data: args,
@@ -72,12 +73,13 @@ jQuery(document).ready(function () {
                 console.log(data)
                 clusters = data["Cluster"]
                 // alert(clusters)
+                $("#chart_area").html("")
                 for (var i in clusters) {
                     console.log(i)
                     $("#chart_area").append('<li id="chart_' + i + '"></li>')
-                    $("#chart_area2").append('<li id="chart2_' + i + '"></li>')
+                    // $("#chart_area2").append('<li id="chart2_' + i + '"></li>')
                     c("chart_",i, 10, clusters[i], data["Sort_keys"], data["Source"])
-                    c("chart2_",i, 10, clusters[i], data["Sort_keys"], data["Origin"])
+                    // c("chart2_",i, 10, clusters[i], data["Sort_keys"], data["Origin"])
                 }
             }
         })
@@ -93,7 +95,7 @@ jQuery(document).ready(function () {
     });
     $('.ui-choose').ui_choose();
     var uc_04 = $('#uc_04').data('ui-choose');
-    var stocks = ["6"]
+    var stocks = "3"
     uc_04.click = function (index, item) {
         stocks = index
         stocks = stocks.join(",")
@@ -158,8 +160,10 @@ jQuery(document).ready(function () {
                 "end_date": Number($("#end_date").datepicker('getDate').format("yyyyMMdd")),
                 "stock": stocks,
                 "types": $("#types").val(),
-                "method": $("#method").val()
+                "method": $("#method").val(),
+                "algorithms": $("#algorithms").val()
             }
+            console.log(args)
             request_date(args)
         })
         $("#end_date").datepicker("setDate", "20170731")
@@ -169,7 +173,8 @@ jQuery(document).ready(function () {
             "stock": "3",
             // "stock": "0,6,3",
             "method": 0,
-            "types": 3
+            "types": 5,
+            "algorithms":1
         })
     });
 

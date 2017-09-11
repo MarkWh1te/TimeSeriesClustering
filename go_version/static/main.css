@@ -54,12 +54,13 @@ p {
 
 .inline_div{
     display: inline-block;
+    padding-bottom:20px 
 }
 .inline_divx{
     font-size: 18px;
 }
 .xxx{
-    padding:20px 0;
+    padding:0px 0 20px;
 }
 .hasDatepicker{
     height: 30px;

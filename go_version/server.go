@@ -83,14 +83,15 @@ func timeToIndex(starttime float64,endtime float64)(int,int){
 
 func cluster(w http.ResponseWriter, r *http.Request) {
 	// get post args
+	fmt.Println("test")
 	r.ParseForm()
 	start_date := r.Form.Get("start_date") 
 	end_date := r.Form.Get("end_date") 
 	types := r.Form.Get("types") 
 	stock := r.Form.Get("stock")
-	// methods := r.Form.Get("method")
+	methods := r.Form.Get("method")
 	// centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
-	fmt.Println(start_date,end_date,types,stock)
+	fmt.Println(start_date,end_date,types,stock,methods)
 
 	// init data
 	datas := codemap[stock]
@@ -115,11 +116,12 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 
 	// get the algorithms answer
 	typesint,_ := strconv.ParseInt(types,10,64)
-	// centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
-	centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
-	data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
-	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 
+	fmt.Println(typesint)
+	// centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
+	if methods =="0"{
+		centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
+		data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 	// generate  json data
 	jData, err := json.Marshal(data)
 	if err != nil{
@@ -130,6 +132,24 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	// write json data into response
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jData)
+
+	}else{
+		centroids, assignments, keys,data_list := get_centroid_rate(rawdata,int(typesint))
+		data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
+	// generate  json data
+	jData, err := json.Marshal(data)
+	if err != nil{
+		fmt.Println(err)
+	}
+	// fmt.Println(keys)
+
+	// write json data into response
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jData)
+
+	}
+	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
+
 }
 
 func main() {

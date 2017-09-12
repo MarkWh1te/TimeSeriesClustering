@@ -21,9 +21,6 @@ func k_means_clust_new(data_list map[int][]float64, num_clust int, num_iter int,
 	for _, v := range rand_keys {
 		centroids = append(centroids, data_list[keys[v]])
 	}
-	//fmt.Println(rand_keys)
-	//fmt.Println(data_list)
-	// fmt.Println("xxxxx", rand_keys,centroids)
 
 	counter := 0
 	assignments := make(map[int][]int)
@@ -36,15 +33,11 @@ func k_means_clust_new(data_list map[int][]float64, num_clust int, num_iter int,
 			assignments[k] = []int{}
 			sumdistance[k] = 0.0
 		}
-		//增加每个质心的误差值保存
+		//cal distance to centroids
 		for k, v := range data_list {
-			// fmt.Println("pppppppppppppppp")
 			min_dist := math.Inf(1)
 			var closest_clust int
-			// fmt.Println(closest_clust)
 			for kk, vv := range centroids {
-				// fmt.Println(LB_Keogh(v,vv,w))
-				// fmt.Println(v, vv, w)
 				if LB_Keogh(v, vv, w) < min_dist {
 					cur_dist := DtwDistance(v, vv)
 					// fmt.Println(cur_dist)
@@ -88,14 +81,11 @@ func bisecting_k_means_clust(data_list map[int][]float64, num_clust int, num_ite
 	var allassign [][]int
 	var alldistance []float64
 	for {
-		//fmt.Println("xxxxxxxxxxxxx")
-		//fmt.Println(len(allcentroids))
 		var lastd = math.Inf(1)
 		lastassign := make(map[int][]int)
 		lastdistance := make(map[int]float64)
 		var lastcentroids [][]float64
-		//求最小值
-		//fmt.Println("yyyyyyyyyyyyyyyy")
+		//get min value
 		for i := 0; i < 20; i++ {
 		// for i := 0; i < 100; i++ {
 
@@ -125,7 +115,7 @@ func bisecting_k_means_clust(data_list map[int][]float64, num_clust int, num_ite
 		if len(allcentroids) == num_clust {
 			break
 		}
-		// 求最大值
+		// cal max
 		var maxdistance = math.Inf(-1)
 		var max_index = 0
 
@@ -244,7 +234,7 @@ func readcsv(path string) map[string][]float64{
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	rawCSVdata = rawCSVdata[:200]
+	rawCSVdata = rawCSVdata[:30]
 
 	// sanity check, display to standard output
 	// for _, each := range rawCSVdata {
@@ -277,61 +267,35 @@ func get_centroid(datas map[string][]float64,n int) ([][]float64, map[int][]int,
 		data_list = append(data_list, a)
 		data_map[v] = a
 	}
-	fmt.Println(data_list)
-	fmt.Println("bbbbbbbbbbb")
 	centroids, assignments := k_means_clust(data_list, n, 100, 3)
-	// centroids, assignments := k_means_clust(data_list, 7, 20, 3)
-	// fmt.Println("okkkkkkkkkkk")
-	// fmt.Println(centroids)
-	// fmt.Println(assignments)
-	fmt.Println(data_list)
 	return centroids, assignments,keys,data_map
 }
 func get_centroid_rate(datas map[string][]float64,n int) ([][]float64, map[int][]int,[]string,map[string][]float64) {
 	var keys = sorted_keys(datas)
-	// fmt.Println(keys)
 	var data_list [][]float64
-	// var data_map map[string][]float64
-	fmt.Println("xxxxxxxx")
 	data_map := make(map[string][]float64)
 	for _, v := range keys {
 		a := to_rate(datas[v])
 		data_list = append(data_list, a)
 		data_map[v] = a
 	}
-	// fmt.Println(data_list)
-	// fmt.Println(n
 	centroids, assignments := k_means_clust(data_list, n, 100, 3)
-	// centroids, assignments := k_means_clust(data_list, 7, 20, 3)
-	// fmt.Println("okkkkkkkkkkk")
-	// fmt.Println(centroids)
-	// fmt.Println(assignments)
 	return centroids, assignments,keys,data_map
 }
 func get_centroid_new(datas map[string][]float64,n int) ([][]float64, map[int][]int,[]string,map[string][]float64) {
 	var keys = sorted_keys(datas)
-	// fmt.Println(keys)
-	// var data_list map[int][]float64
 	data_list := make(map[int][]float64)
-	// var data_map map[string][]float64
-	fmt.Println("zzzzzzzz")
 	data_map := make(map[string][]float64)
 	for k, v := range keys {
 		a := to_zero(datas[v])
 		data_list[k] = a
 		data_map[v] = a
 	}
-	// fmt.Println(data_list)
-	// fmt.Println(n)
 	centroids, assignments := bisecting_k_means_clust(data_list, n, 20, 3)
-	// fmt.Println("okkkkkkkkkkk")
-	// fmt.Println(centroids)
-	// fmt.Println(assignments)
 	newassignments := make(map[int][]int)
 	for k,v := range assignments{
 		newassignments[k] = v
 	}
-	// fmt.Println(newassignments,keys,data_map)
 	return centroids, newassignments,keys,data_map
 }
 
@@ -341,20 +305,16 @@ func to_zero(arr []float64) []float64 {
 	for _, v := range arr {
 		tmp = append(tmp, Round(v-arr[0], 2))
 	}
-	// fmt.Println(tmp)
 	return tmp
 }
 
 func to_rate(arr []float64) []float64 {
 	var tmp []float64
 	for k, v := range arr {
-		// tmp = append(tmp, Round(v-arr[0], 2))
-		// tmp = append(tmp, Round(v/arr[0], 2))
 		if k!=0{
 		tmp = append(tmp,Round((v-arr[k-1])/arr[k-1],2))
 		}
 	}
-	// fmt.Println(tmp)
 	return tmp
 }
 
@@ -462,19 +422,14 @@ func DtwDistance(s1 []float64, s2 []float64) float64 {
 		upper := int(math.Min(float64(len(s2)), float64(i)+w))
 		for j := lower; j < upper; j++ {
 			dist := math.Pow(s1[i]-s2[j], 2)
-			// fmt.Println(i,j,s1[i]+s2[j],dist)
 			values := []float64{DTW[[2]int{i, j - 1}], DTW[[2]int{i - 1, j}], DTW[[2]int{i - 1, j - 1}]}
-			// DTW[[2]int{i + 1, j + 1}] = dist + min(values)
 			DTW[[2]int{i, j}] = dist + min(values)
-			// fmt.Println(i,j,dist,values,min(values))
-			// fmt.Println(DTW[[2]int{i, j}])
 		}
 	}
 	return math.Sqrt(DTW[[2]int{len(s1) - 1, len(s2) - 1}])
 }
 
 func LB_Keogh(s1 []float64, s2 []float64, r int) float64 {
-	// fmt.Println(len(s1),len(s2),r)
 	LB_sum := 0.0
 	for ind, i := range s1 {
 		start := 0
@@ -499,8 +454,6 @@ func LB_Keogh(s1 []float64, s2 []float64, r int) float64 {
 }
 func rand_centroids(data_list [][]float64, num_clust int)[][]float64{
 
-	// fmt.Println(data_list)
-	// fmt.Println("xxxxxxx")
 	// generate init centorids
 	rand_keys := (generateRandomNumber(0, len(data_list), num_clust))
 	var centroids [][]float64
@@ -539,8 +492,6 @@ func get_maxline(data_list [][]float64,centroids [][]float64,ignore_keys []int)(
 
 func kpp_centroids(data_list [][]float64, num_clust int)[][]float64{
 
-	// fmt.Println(num_clust)
-	// fmt.Println("kpp")
 	// generate init centorids
 	rand_keys := (generateRandomNumber(0, len(data_list), 1))
 	rand_key := rand_keys[0]
@@ -554,14 +505,12 @@ func kpp_centroids(data_list [][]float64, num_clust int)[][]float64{
 		centroids = append(centroids,max_line)
 		ignore_keys = append(ignore_keys,max_index)
 	}
-	// fmt.Println(centroids)
 	return centroids
 }
 
 func k_means_clust(data_list [][]float64, num_clust int, num_iter int, w int) ([][]float64, map[int][]int) {
 
-    // centroids:=rand_centroids(data_list,num_clust) // fmt.Println(num_clust)
-    centroids:=kpp_centroids(data_list,num_clust)
+	centroids:=kpp_centroids(data_list,num_clust)
 	// generate init centorids
 	// rand_keys := (generateRandomNumber(0, len(data_list), num_clust))
 	// var centroids [][]float64
@@ -574,16 +523,13 @@ func k_means_clust(data_list [][]float64, num_clust int, num_iter int, w int) ([
 	assignments := make(map[int][]int)
 	for i := 0; i < num_iter; i++ {
 		counter += 1
-		// fmt.Println("counter times", counter, "centroids", centroi
 		// init empty  assignment every iteration
 		for k, _ := range centroids {
 			assignments[k] = []int{}
 		}
 		for k, v := range data_list {
-			// fmt.Println("pppppppppppppppp")
 			min_dist := math.Inf(1)
 			var closest_clust int
-			// fmt.Println(closest_clust)
 			for kk, vv := range centroids {
 				if LB_Keogh(v, vv, w) < min_dist {
 					cur_dist := DtwDistance(v, vv)
@@ -593,7 +539,6 @@ func k_means_clust(data_list [][]float64, num_clust int, num_iter int, w int) ([
 					}
 				}
 			}
-			// fmt.Println(closest_clust)
 			assignments[closest_clust] = append(assignments[closest_clust], k)
 			// fmt.Println("iter times",i,"assignment",assignments)
 		}
@@ -614,8 +559,6 @@ func k_means_clust(data_list [][]float64, num_clust int, num_iter int, w int) ([
 
 		}
 	}
-	// fmt.Println(data_list)
-	// fmt.Println(";;;;;;;")
 	return centroids, assignments
 }
 

@@ -1,4 +1,5 @@
-package main import ( 
+package main 
+import ( 
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -30,11 +31,27 @@ func concatemaps(x map[string][]float64,y map[string][]float64)map[string][]floa
 	return new
 }
 
+func stringInSlice(a string, list []string) bool {
+    for _, b := range list {
+        if b == a {
+			//see k v
+            return true
+        }
+    }
+    return false
+}
+
+
 func packData(sw string,data map[string][]float64)map[string][]float64{
 	new := make(map[string][]float64)
 	stocklist :=  indumap[sw]
 	for k,v := range(data){
+		if stringInSlice(k[:len(k)-3],stocklist){
+			new[k[:len(k)-3]] = v
+		}
 	}
+	fmt.Println("nums",len(stocklist),len(data),len(new))
+	return new
 }
 
 var start0 = readcsv("start0-2011-01-012017-08-01.csv")
@@ -99,24 +116,22 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	stock := r.Form.Get("stock")
 	methods := r.Form.Get("method")
 	// centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
-	fmt.Println(start_date,end_date,types,stock,methods)
+	fmt.Println(start_date,end_date,types,stock,methods,sw)
+
 
 	// init data
+	stock = "0,6,3"
 	datas := codemap[stock]
 	start_float,_ := strconv.ParseFloat(start_date,64)
 	end_float,_ := strconv.ParseFloat(end_date,64)
 	min_idx,max_idx := timeToIndex(start_float,end_float)
-	fmt.Println(min_idx,max_idx)
-	rawdata := ShortData(datas,min_idx,max_idx)
+	new_datas := packData(sw,datas)
+	rawdata := ShortData(new_datas,min_idx,max_idx)
 	// rawdata := ShortData(datas,20,30)
 
 	// fmt.Println(stock)
 	// fmt.Println(start36)
 	// fmt.Println(codemap["6,3"])
-	
-	// fmt.Println(rawdata)
-
-
 	// fmt.Println(raw)
 	// csv_data := dataclean(raw)
 	// fmt.Println(csv_data)
@@ -125,7 +140,6 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	// get the algorithms answer
 	typesint,_ := strconv.ParseInt(types,10,64)
 
-	fmt.Println(typesint)
 	// centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
 	if methods =="0"{
 		centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))

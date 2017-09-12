@@ -43,26 +43,33 @@ p {
 
 .chart_areas li {
     display: inline-block;
-    width: 33%;
+    width: 50%;
 
 }
 
-#user_select{
-    padding:20px 50px;
+#user_select {
+    padding: 20px 50px;
 
 }
 
-.inline_div{
+#chart_area {
+    width: 100%;
+}
+
+.inline_div {
     display: inline-block;
-    padding-bottom:20px 
+    padding-bottom: 20px
 }
-.inline_divx{
+
+.inline_divx {
     font-size: 18px;
 }
-.xxx{
-    padding:0px 0 20px;
+
+.xxx {
+    padding: 0px 0 20px;
 }
-.hasDatepicker{
+
+.hasDatepicker {
     height: 30px;
     border-radius: 5px;
     border-width: 1px;
@@ -70,11 +77,16 @@ p {
     border-color: #A9A9A9;
 }
 
-.time_select{
+.time_select {
     line-height: 30px;
 }
-.btn{
-    height:30px;
-    width:40px;
+
+.btn {
+    height: 30px;
+    width: 40px;
     border-radius: 5px;
+}
+
+.sw div.select-block {
+    width: 125px;
 }

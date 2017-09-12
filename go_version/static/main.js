@@ -1,3 +1,7 @@
+/**
+ * Created by Ky on 2017/8/13.
+ */
+
 // 日期格式化方法
 Date.prototype.format = function (format) {
     var date = {
@@ -20,7 +24,7 @@ Date.prototype.format = function (format) {
     }
     return format;
 }
-var c = function (char_id,index, num, data, data_2, data_3) {
+var c = function (char_id, index, num, data, data_2, data_3) {
     var id = char_id + index
     var arr = []
     var len = data.length
@@ -42,6 +46,10 @@ var c = function (char_id,index, num, data, data_2, data_3) {
     var chart = new Highcharts.Chart(id, {// 图表初始化函数，其中 container 为图表的容器 div
         chart: {
             type: 'line'                           //指定图表的类型，默认是折线图（line）
+        },
+        legend: {
+            floating: true,
+            enabled: false
         },
         title: {
             text: '分类:' + index//指定图表标题
@@ -74,7 +82,7 @@ jQuery(document).ready(function () {
                     console.log(i)
                     $("#chart_area").append('<li id="chart_' + i + '"></li>')
                     // $("#chart_area2").append('<li id="chart2_' + i + '"></li>')
-                    c("chart_",i, 10, clusters[i], data["Sort_keys"], data["Source"])
+                    c("chart_", i, 10, clusters[i], data["Sort_keys"], data["Source"])
                     // c("chart2_",i, 10, clusters[i], data["Sort_keys"], data["Origin"])
                 }
             }
@@ -91,7 +99,7 @@ jQuery(document).ready(function () {
     });
     $('.ui-choose').ui_choose();
     var uc_04 = $('#uc_04').data('ui-choose');
-    var stocks = "3"
+    var stocks = "6"
     uc_04.click = function (index, item) {
         stocks = index
         stocks = stocks.join(",")
@@ -157,7 +165,8 @@ jQuery(document).ready(function () {
                 "stock": stocks,
                 "types": $("#types").val(),
                 "method": $("#method").val(),
-                "algorithms": $("#algorithms").val()
+                "algorithms": $("#algorithms").val(),
+                "sw": $("#sw").val()
             }
             console.log(args)
             request_date(args)
@@ -170,7 +179,8 @@ jQuery(document).ready(function () {
             // "stock": "0,6,3",
             "method": 0,
             "types": 5,
-            "algorithms":1
+            "algorithms": 1,
+            "sw": "420000"
         })
     });
 

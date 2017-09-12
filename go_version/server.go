@@ -1,5 +1,4 @@
-package main 
-import ( 
+package main import ( 
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -29,6 +28,13 @@ func concatemaps(x map[string][]float64,y map[string][]float64)map[string][]floa
 		new[k] = v
 	}
 	return new
+}
+
+func packData(sw string,data map[string][]float64)map[string][]float64{
+	new := make(map[string][]float64)
+	stocklist :=  indumap[sw]
+	for k,v := range(data){
+	}
 }
 
 var start0 = readcsv("start0-2011-01-012017-08-01.csv")
@@ -81,11 +87,13 @@ func timeToIndex(starttime float64,endtime float64)(int,int){
 	return min_idx,max_idx
 }
 
+
 func cluster(w http.ResponseWriter, r *http.Request) {
 	// get post args
 	fmt.Println("test")
 	r.ParseForm()
 	start_date := r.Form.Get("start_date") 
+	sw := r.Form.Get("sw") 
 	end_date := r.Form.Get("end_date") 
 	types := r.Form.Get("types") 
 	stock := r.Form.Get("stock")
@@ -149,8 +157,8 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 
 	}
 	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
-
 }
+
 
 func main() {
 

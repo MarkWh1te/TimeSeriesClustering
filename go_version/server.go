@@ -162,8 +162,9 @@ func main() {
 	// fmt.Println("Binomial took", elapsed)
 
 	// http.HandleFunc("/", handler)
+	fmt.Printf("start")
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs)
 	http.HandleFunc("/cluster", cluster)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe("108.61.181.78:3000", nil)
 }

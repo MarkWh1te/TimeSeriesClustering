@@ -178,7 +178,7 @@ jQuery(document).ready(function () {
             "stock": "3",
             // "stock": "0,6,3",
             "method": 0,
-            "types": 5,
+            "types": 4,
             "algorithms": 1,
             "sw": "420000"
         })

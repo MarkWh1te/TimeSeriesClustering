@@ -177,6 +177,7 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 
 	// get the algorithms answer
 	typesint,_ := strconv.ParseInt(types,10,64)
+	var data StockData
 
 	// centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
 	if methods =="0"{
@@ -184,24 +185,15 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 		orderassignments := orderAssignments(centroids,assignments)
 		fmt.Println(len(centroids),len(assignments),len(orderassignments))
 		// data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
-		data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
+		data= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
 	// generate  json data
-	jData, err := json.Marshal(data)
-	if err != nil{
-		fmt.Println(err)
-	}
-	// fmt.Println(keys)
-
-	// write json data into response
-	// w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jData)
 
 	}else{
 		centroids, assignments, keys,data_list := get_centroid_rate(rawdata,int(typesint))
 		orderassignments := orderAssignments(centroids,assignments)
 		// data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
-		data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
+		data= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
+	}
 	// generate  json data
 	jData, err := json.Marshal(data)
 	if err != nil{
@@ -210,10 +202,10 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(keys)
 
 	// write json data into response
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jData)
 
-	}
 	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 }
 

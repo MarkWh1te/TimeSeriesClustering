@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sort"
 	// "time"
 )
 type StockData struct {
 	Source    map[string][]float64
 	Origin   map[string][]float64
-	Cluster   map[int][]int
+	// Cluster   map[int][]int
+	Cluster   [][]int
 	Centers   [][]float64
 	Sort_keys []string
 	Id      string
@@ -104,6 +106,43 @@ func timeToIndex(starttime float64,endtime float64)(int,int){
 	return min_idx,max_idx
 }
 
+func calDistances(centroids [][]float64)[]float64{
+	var results []float64
+	var distances float64
+	for _,v := range centroids{
+		distances = v[len(v)-1] - v[0]
+		fmt.Println(distances,v[len(v)-1],v[0])
+		results = append(results,distances)
+	}
+	return results
+}
+
+func orderCentroids(centroids [][]float64)[]int{
+	var results []int
+	centroidsdistances :=  calDistances(centroids)
+	sort.Sort(sort.Reverse(sort.Float64Slice(centroidsdistances)))
+	origindistances:=  calDistances(centroids)
+	for _,v := range centroidsdistances{
+		index := 0
+		for i,j := range origindistances{
+			if j == v{
+				index = i
+			}
+		}
+		results = append(results,index)
+	}
+	return results
+}
+
+func orderAssignments(centroids [][]float64,assignments map[int][]int)([][]int){
+	var results [][]int
+	ordercentroids := orderCentroids(centroids)
+	for _,v := range ordercentroids{
+		results = append(results,assignments[v])
+	}
+	return results
+}
+
 
 func cluster(w http.ResponseWriter, r *http.Request) {
 	// get post args
@@ -129,7 +168,6 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	rawdata := ShortData(new_datas,min_idx,max_idx)
 	// rawdata := ShortData(datas,20,30)
 
-	// fmt.Println(stock)
 	// fmt.Println(start36)
 	// fmt.Println(codemap["6,3"])
 	// fmt.Println(raw)
@@ -143,7 +181,10 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	// centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
 	if methods =="0"{
 		centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
-		data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
+		orderassignments := orderAssignments(centroids,assignments)
+		fmt.Println(len(centroids),len(assignments),len(orderassignments))
+		// data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
+		data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
 	// generate  json data
 	jData, err := json.Marshal(data)
 	if err != nil{
@@ -152,12 +193,15 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(keys)
 
 	// write json data into response
+	// w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jData)
 
 	}else{
 		centroids, assignments, keys,data_list := get_centroid_rate(rawdata,int(typesint))
-		data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
+		orderassignments := orderAssignments(centroids,assignments)
+		// data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
+		data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
 	// generate  json data
 	jData, err := json.Marshal(data)
 	if err != nil{

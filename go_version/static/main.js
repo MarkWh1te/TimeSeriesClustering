@@ -1,7 +1,3 @@
-/**
- * Created by Ky on 2017/8/13.
- */
-
 // 日期格式化方法
 Date.prototype.format = function (format) {
     var date = {
@@ -29,7 +25,6 @@ var c = function (char_id, index, num, data, data_2, data_3) {
     var arr = []
     var len = data.length
     while (len) {
-
         arr.push(len)
         len--
     }
@@ -42,7 +37,7 @@ var c = function (char_id, index, num, data, data_2, data_3) {
             }
         )
     }
-    console.log(series)
+    // console.log(series)
     var chart = new Highcharts.Chart(id, {// 图表初始化函数，其中 container 为图表的容器 div
         chart: {
             type: 'line'                           //指定图表的类型，默认是折线图（line）
@@ -68,18 +63,14 @@ var c = function (char_id, index, num, data, data_2, data_3) {
 jQuery(document).ready(function () {
     var request_date = function (args) {
         $.ajax({
-            // url: "http://127.0.0.1:5000/cluster", 
             url: "http://127.0.0.1:8080/cluster",
             type: "post",
             async: false,
             data: args,
             success: function (data) {
-                console.log(data)
                 clusters = data["Cluster"]
-                // alert(clusters)
                 $("#chart_area").html("")
                 for (var i in clusters) {
-                    console.log(i)
                     $("#chart_area").append('<li id="chart_' + i + '"></li>')
                     // $("#chart_area2").append('<li id="chart2_' + i + '"></li>')
                     c("chart_", i, 10, clusters[i], data["Sort_keys"], data["Source"])
@@ -157,7 +148,6 @@ jQuery(document).ready(function () {
             }
         );
         $("#start").on("click", function () {
-            // alert($("#types").html())
             args = {
 
                 "start_date": Number($("#start_date").datepicker('getDate').format("yyyyMMdd")),
@@ -168,7 +158,6 @@ jQuery(document).ready(function () {
                 "algorithms": $("#algorithms").val(),
                 "sw": $("#sw").val()
             }
-            console.log(args)
             request_date(args)
         })
         $("#end_date").datepicker("setDate", "20170731")
@@ -176,7 +165,6 @@ jQuery(document).ready(function () {
             "start_date": 20170715,
             "end_date": 20170731,
             "stock": "3",
-            // "stock": "0,6,3",
             "method": 0,
             "types": 4,
             "algorithms": 1,

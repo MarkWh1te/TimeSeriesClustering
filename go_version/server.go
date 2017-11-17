@@ -5,23 +5,19 @@ import (
 	"net/http"
 	"strconv"
 	"sort"
-	// "time"
 )
+
+// stock struct  for json serialize
 type StockData struct {
 	Source    map[string][]float64
 	Origin   map[string][]float64
-	// Cluster   map[int][]int
 	Cluster   [][]int
 	Centers   [][]float64
 	Sort_keys []string
 	Id      string
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r)
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
+//function for concate two maps
 func concatemaps(x map[string][]float64,y map[string][]float64)map[string][]float64{
 	new := make(map[string][]float64)
 	for k,v := range x{
@@ -33,17 +29,17 @@ func concatemaps(x map[string][]float64,y map[string][]float64)map[string][]floa
 	return new
 }
 
+// function determinate if a string in slice
 func stringInSlice(a string, list []string) bool {
     for _, b := range list {
         if b == a {
-			//see k v
             return true
         }
     }
     return false
 }
 
-
+// 股票行业分类
 func packData(sw string,data map[string][]float64)map[string][]float64{
 	new := make(map[string][]float64)
 	stocklist :=  indumap[sw]
@@ -52,10 +48,10 @@ func packData(sw string,data map[string][]float64)map[string][]float64{
 			new[k[:len(k)-3]] = v
 		}
 	}
-	fmt.Println("nums",len(stocklist),len(data),len(new))
 	return new
 }
 
+//  init stock data 
 var start0 = readcsv("start0-2011-01-012017-08-01.csv")
 var start3 = readcsv("start3-2011-01-012017-08-01.csv")
 var start6 = readcsv("start6-2011-01-012017-08-01.csv")
@@ -64,6 +60,7 @@ var start06 = concatemaps(start0,start6)
 var start36 = concatemaps(start3,start6)
 var start036 = concatemaps(start03,start6)
 
+//  code map for different market
 var codemap = map[string]map[string][]float64{
 	"0":start0,
 	"3":start3,
@@ -77,10 +74,9 @@ var codemap = map[string]map[string][]float64{
 // var data3 = dataclean(start3)
 // var data6 = dataclean(start6)
 
+// translate time to index
 func timeToIndex(starttime float64,endtime float64)(int,int){
 	var min_idx,max_idx int
-	// starttime = float64(starttime)
-	// endtime = float64(endtime)
 	for k,v := range stocklist{
 		min_idx = k
 		if starttime == v{
@@ -102,11 +98,12 @@ func timeToIndex(starttime float64,endtime float64)(int,int){
 			break
 		}
 	}
-	fmt.Println(min_idx,max_idx)
+	// fmt.Println(min_idx,max_idx)
 	return min_idx,max_idx
 }
 
-func calDistances(centroids [][]float64)[]float64{
+// caculate within a centroids
+func calDistances(centroids [][]float64)[]float64{ 
 	var results []float64
 	var distances float64
 	for _,v := range centroids{
@@ -117,6 +114,7 @@ func calDistances(centroids [][]float64)[]float64{
 	return results
 }
 
+//sort centroids base on its distance
 func orderCentroids(centroids [][]float64)[]int{
 	var results []int
 	centroidsdistances :=  calDistances(centroids)
@@ -134,6 +132,7 @@ func orderCentroids(centroids [][]float64)[]int{
 	return results
 }
 
+//  order assigments with centroids
 func orderAssignments(centroids [][]float64,assignments map[int][]int)([][]int){
 	var results [][]int
 	ordercentroids := orderCentroids(centroids)
@@ -146,7 +145,6 @@ func orderAssignments(centroids [][]float64,assignments map[int][]int)([][]int){
 
 func cluster(w http.ResponseWriter, r *http.Request) {
 	// get post args
-	fmt.Println("test")
 	r.ParseForm()
 	start_date := r.Form.Get("start_date") 
 	sw := r.Form.Get("sw") 
@@ -154,11 +152,8 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	types := r.Form.Get("types") 
 	stock := r.Form.Get("stock")
 	methods := r.Form.Get("method")
-	// centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
-	fmt.Println(start_date,end_date,types,stock,methods,sw)
 
-
-	// init data
+	// init  deplay data 
 	stock = "0,6,3"
 	datas := codemap[stock]
 	start_float,_ := strconv.ParseFloat(start_date,64)
@@ -166,32 +161,18 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	min_idx,max_idx := timeToIndex(start_float,end_float)
 	new_datas := packData(sw,datas)
 	rawdata := ShortData(new_datas,min_idx,max_idx)
-	// rawdata := ShortData(datas,20,30)
-
-	// fmt.Println(start36)
-	// fmt.Println(codemap["6,3"])
-	// fmt.Println(raw)
-	// csv_data := dataclean(raw)
-	// fmt.Println(csv_data)
-	// datas = csv_data
-
-	// get the algorithms answer
 	typesint,_ := strconv.ParseInt(types,10,64)
-	var data StockData
 
-	// centroids, assignments, keys,data_list := get_centroid_new(rawdata,int(typesint))
+	var data StockData
+	// 价格模式
 	if methods =="0"{
 		centroids, assignments, keys,data_list := get_centroid(rawdata,int(typesint))
 		orderassignments := orderAssignments(centroids,assignments)
-		fmt.Println(len(centroids),len(assignments),len(orderassignments))
-		// data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
-		data= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
-	// generate  json data
-
+		data = StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
+	// 涨幅模式
 	}else{
 		centroids, assignments, keys,data_list := get_centroid_rate(rawdata,int(typesint))
 		orderassignments := orderAssignments(centroids,assignments)
-		// data:= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 		data= StockData{Origin:rawdata,Source:data_list,Sort_keys:keys,Cluster:orderassignments,Centers:centroids}
 	}
 	// generate  json data
@@ -199,27 +180,21 @@ func cluster(w http.ResponseWriter, r *http.Request) {
 	if err != nil{
 		fmt.Println(err)
 	}
-	// fmt.Println(keys)
-
 	// write json data into response
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jData)
-
 	// data:= StockData{Source:data0,Sort_keys:keys,Cluster:assignments,Centers:centroids}
 }
 
 
 func main() {
-
 	// calculate fucntion runining time kk
 	// start := time.Now()
 	// _, assignments := get_centroid()
 	// fmt.Println(assignments)
 	// elapsed := time.Since(start)
 	// fmt.Println("Binomial took", elapsed)
-
-	// http.HandleFunc("/", handler)
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs)
 	http.HandleFunc("/cluster", cluster)
